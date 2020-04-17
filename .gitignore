@@ -1,0 +1,3 @@
+mapreduce-wordcount/target/
+.idea/
+*.iml
