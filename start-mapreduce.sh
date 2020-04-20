@@ -1,24 +1,27 @@
 #!/bin/bash
 
-working_dir=test
-input_dir=$working_dir/input
-output_dir=$working_dir/output
+hadoop_working_dir=test
+hadoop_input_dir=$hadoop_working_dir/input
+hadoop_output_dir=$hadoop_working_dir/output
 
-jar_name=mapreduce-wordcount-1.0-SNAPSHOT.jar
-if hadoop fs -test -d "$working_dir"; then 
-	hadoop fs -rm -r $working_dir/*
-	hadoop fs -rm -r .Trash/*
+module_name=mapreduce-wordcount
+jar_name=$module_name/target/mapreduce-wordcount-1.0-SNAPSHOT.jar
+resources_dir=$module_name/src/main/resources
+
+mvn clean package
+
+if hadoop fs -test -d "$hadoop_working_dir"; then 
+	hadoop fs -rm -r $hadoop_working_dir/* .Trash/*
 else 
-	hadoop fs mkdir $working_dir
+	hadoop fs -mkdir $hadoop_working_dir
 fi
-hadoop fs -mkdir $input_dir
-hadoop fs -put file*.txt $input_dir
 
-hadoop jar $jar_name $input_dir $output_dir
+hadoop fs -mkdir $hadoop_input_dir
+hadoop fs -put $resources_dir/*.txt $hadoop_input_dir
+hadoop jar $jar_name $hadoop_input_dir $hadoop_output_dir
+hadoop fs -ls $hadoop_output_dir
 
-hadoop fs -ls $output_dir
-
-for file in `hadoop fs -find $output_dir -name "part-*"`
+for file in `hadoop fs -find $hadoop_output_dir -name "part-*"`
 do
 	hadoop fs -cat $file
 done
